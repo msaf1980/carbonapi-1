@@ -27,10 +27,16 @@ func ParseCommon(r io.Reader) (Common, error) {
 	return c, err
 }
 
+type Backends2 struct {
+	groupName string  `yaml:"groupName"`
+	servers map[string]int `yaml:"servers"`
+}
+
 type Common struct {
-	Listen         string   `yaml:"listen"`
-	ListenInternal string   `yaml:"listenInternal"`
-	Backends       []string `yaml:"backends"`
+	Listen         string      `yaml:"listen"`
+	ListenInternal string      `yaml:"listenInternal"`
+	Backends       []string    `yaml:"backends"`
+	Backends2      []Backends2 `yaml:"backends2"`
 
 	MaxProcs                  int           `yaml:"maxProcs"`
 	Timeouts                  Timeouts      `yaml:"timeouts"`

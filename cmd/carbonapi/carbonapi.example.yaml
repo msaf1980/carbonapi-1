@@ -101,6 +101,24 @@ upstreams:
         - "http://127.0.0.3:8080"
         - "http://127.0.0.4:8080"
 
+    # Responce from different group are merged
+    # Servers in format: 
+    # "proto://server:port": weight
+    # In group requests routed to server with greater weight
+    # If request failed, than to next with greater priority
+    # In equal priority first in list selected (in plan - load balancing)
+    backends2:
+      - groupName: "group1"
+        servers:
+          - "http://127.0.0.1:8080": 3
+          - "http://127.0.0.3:8888": 2
+          - "http://127.0.0.4:8889": 1
+      - groupName: "group2"
+        servers:
+          - "http://127.0.0.2:8080": 3
+          - "http://127.0.0.3:8888": 2
+          - "http://127.0.0.4:8889": 2
+ 
     carbonsearch:
         # Instance of carbonsearch backend
         backend: "http://127.0.0.1:8070"

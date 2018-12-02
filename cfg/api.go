@@ -49,6 +49,10 @@ func ParseAPIConfig(r io.Reader) (API, error) {
 		api.Backends = pre.Upstreams.Backends
 	}
 
+	if len(pre.Upstreams.Backends2) >= 1 {
+		api.Backends2 = pre.Upstreams.Backends2
+	}
+
 	return api, nil
 }
 
