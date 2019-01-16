@@ -249,7 +249,7 @@ func SummarizeValues(f string, values []float64) float64 {
 			rv += av
 		}
 
-	case "avg":
+	case "avg", "average":
 		for _, av := range values {
 			rv += av
 		}
@@ -272,7 +272,35 @@ func SummarizeValues(f string, values []float64) float64 {
 		if len(values) > 0 {
 			rv = values[len(values)-1]
 		}
+	case "range":
+		vMax := math.Inf(-1)
+		vMin := math.Inf(1)
+		for _, av := range values {
+			if av > vMax {
+				vMax = av
+			}
+			if av < vMin {
+				vMin = av
+			}
+		}
 
+		rv = vMax - vMin
+	case "median":
+		rv = Percentile(values, 50, true)
+	case "multiply":
+		rv = values[0]
+		for _, av := range values[1:] {
+			rv *= av
+		}
+	case "diff":
+		rv = values[0]
+		for _, av := range values[1:] {
+			rv -= av
+		}
+	case "count":
+		rv = float64(len(values))
+	case "stddev":
+		rv = math.Sqrt(VarianceValue(values, nil))
 	default:
 		f = strings.Split(f, "p")[1]
 		percent, err := strconv.ParseFloat(f, 64)
@@ -373,7 +401,11 @@ func Percentile(data []float64, percent float64, interpolate bool) float64 {
 func MaxValue(f64s []float64, absent []bool) float64 {
 	m := math.Inf(-1)
 	for i, v := range f64s {
-		if absent[i] {
+		if len(absent) == 0 {
+			if math.IsNaN(v) {
+				continue
+			}
+		} else if absent[i] {
 			continue
 		}
 		if v > m {
@@ -387,7 +419,11 @@ func MaxValue(f64s []float64, absent []bool) float64 {
 func MinValue(f64s []float64, absent []bool) float64 {
 	m := math.Inf(1)
 	for i, v := range f64s {
-		if absent[i] {
+		if len(absent) == 0 {
+			if math.IsNaN(v) {
+				continue
+			}
+		} else if absent[i] {
 			continue
 		}
 		if v < m {
@@ -402,7 +438,11 @@ func AvgValue(f64s []float64, absent []bool) float64 {
 	var t float64
 	var elts int
 	for i, v := range f64s {
-		if absent[i] {
+		if len(absent) == 0 {
+			if math.IsNaN(v) {
+				continue
+			}
+		} else if absent[i] {
 			continue
 		}
 		elts++
@@ -414,7 +454,11 @@ func AvgValue(f64s []float64, absent []bool) float64 {
 // CurrentValue returns last non-absent value (if any), otherwise returns NaN
 func CurrentValue(f64s []float64, absent []bool) float64 {
 	for i := len(f64s) - 1; i >= 0; i-- {
-		if !absent[i] {
+		if len(absent) == 0 {
+			if math.IsNaN(f64s[i]) {
+				return f64s[i]
+			}
+		} else if !absent[i] {
 			return f64s[i]
 		}
 	}
@@ -433,7 +477,11 @@ func VarianceValue(f64s []float64, absent []bool) float64 {
 	}
 
 	for i, v := range f64s {
-		if absent[i] {
+		if len(absent) == 0 {
+			if math.IsNaN(v) {
+				continue
+			}
+		} else if absent[i] {
 			continue
 		}
 		elts++
