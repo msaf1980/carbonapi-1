@@ -364,6 +364,8 @@ FOR:
 		}
 
 		switch s[i] {
+		case '=':
+			continue
 		case '{':
 			braces++
 		case '}':
